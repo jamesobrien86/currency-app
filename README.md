@@ -1,5 +1,5 @@
 # currency-app
-Simple currency application built without any JS Framework
+This is a project demo that uses Vanilla JS to build a Single Page Application.
 
 # Features
 - display the latest currency rates
