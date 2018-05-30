@@ -2,7 +2,7 @@ require('dotenv').config(); // read .env files
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const { getRates, getSymbols } = require('./lib/fixer-service');
+const { getRates, getSymbols, getHistoricalRate } = require('./lib/fixer-service');
 const { convertCurrency } = require('./lib/free-currency-service');
 
 const app = express();
@@ -52,7 +52,7 @@ app.get('/api/symbols', async (req, res) => {
       errorHandler(error, req, res);
     }
   });
-  
+
   // Convert Currency
   app.post('/api/convert', async (req, res) => {
     try {
@@ -64,6 +64,21 @@ app.get('/api/symbols', async (req, res) => {
       errorHandler(error, req, res);
     }
   });
+
+  // Fetch Currency Rates by Date
+  app.post('/api/historical', async (req, res) => {
+        try {
+            const { date } = req.body();
+            const data = await getHistoricalRate(date);
+            res.setHeader('Content-type','application/json');
+            res.send(data);
+            
+        } catch (error) {
+            errorHandler(error, req , res);
+        }
+  });
+
+
   
 
 
