@@ -1,6 +1,8 @@
 require('dotenv').config(); // read .env files
-
 const express = require('express');
+
+const { getRates, getSymbols } = require('./lib/fixer-service');
+const { convertCurrency } = require('./lib/free-currency-service');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -10,6 +12,7 @@ app.use(express.static('public'));
 
 // Allow front-end access to node_modules folder
 app.use('/scripts', express.static(`${__dirname}/node_modules/`));
+
 
 // Express Error Handler 
 const errorHandler = (err, req, res) => {
@@ -31,6 +34,31 @@ app.get('/api/rates', async(req,res) => {
     }
 });
 
+// Fetch Symbols
+app.get('/api/symbols', async (req, res) => {
+    try {
+      const data = await getSymbols();
+      res.setHeader('Content-Type', 'application/json');
+      res.send(data);
+    } catch (error) {
+      errorHandler(error, req, res);
+    }
+  });
+  
+  // Convert Currency
+  app.post('/api/convert', async (req, res) => {
+    try {
+      const { from, to } = req.body;
+      const data = await convertCurrency(from, to);
+      res.setHeader('Content-Type', 'application/json');
+      res.send(data);
+    } catch (error) {
+      errorHandler(error, req, res);
+    }
+  });
+  
+
+
 // Redirect all traffic to index.html
 app.use((req,res) => res.sendFile(`${__dirname}/public/index.html`));
 
@@ -38,16 +66,3 @@ app.use((req,res) => res.sendFile(`${__dirname}/public/index.html`));
 app.listen(port, () => {
     console.log('listening on %d', port);
 });
-
-const { getRates } = require('./lib/fixer-service');
-
-
-
-
-// const test = async() => {
-//     const data = await getRates();
-//     console.log(data);
-// }
-
-// test();
-
