@@ -68,7 +68,7 @@ app.get('/api/symbols', async (req, res) => {
   // Fetch Currency Rates by Date
   app.post('/api/historical', async (req, res) => {
         try {
-            const { date } = req.body();
+            const { date } = req.body;
             const data = await getHistoricalRate(date);
             res.setHeader('Content-type','application/json');
             res.send(data);
@@ -78,8 +78,6 @@ app.get('/api/symbols', async (req, res) => {
         }
   });
 
-
-  
 
 
 // Redirect all traffic to index.html
