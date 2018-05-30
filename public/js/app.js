@@ -111,10 +111,55 @@ window.addEventListener('load', () => {
                 showError(error);
         }
     });
+
+    const getHistoricalRates = async () => {
+        const date = $('#date').val();
+        try {
+            const response = await api.post('/historical', { date });
+            const { base, rates } = response.data;
+            const html = ratesTemplate({ base, date, rates });
+            $('#historical-table').html(html);
+        } catch (error) {
+            showError(errror);
+        } finally{
+            $('.segment').removeClass('loading');
+
+        }
+    }
+
+    const historicalRatesHandler = () => {
+        if($('.ui.form').form('is valid')){
+            // hide error message
+            $('.ui.error.message').hide();
+            // indicate loading status
+            $('.segment').addClass('loading');
+            getHistoricalRates();
+            // prevent pages from submitting to server
+            return false;
+        }
+        return true;
+    };
    
     router.add('/historical', () => {
+        // Display form
         let html = historicalTemplate();
         el.html(html);
+        // Activate Date Picker
+        $('#calendar').calendar({
+            type:'date',
+            formatter:{
+                //format date to yyyy-mm-dd
+                date: date => new Date(date).toISOString().split('T')[0],
+            },
+        });
+        // Validate Date Input
+        $('.ui.form').form({
+            fields:{
+                date:'empty',
+            },
+        });
+        $('.submit').click(historicalRatesHandler);
+
     });
 
     // Navigate app to current url
